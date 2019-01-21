@@ -73,6 +73,26 @@ const resolveModule = (resolveFn, filePath) => {
   return resolveFn(`${filePath}.js`);
 };
 
+function getTsConfig(resolveFn) {
+  let tsConfig = 'tsconfig.json';
+
+  if (process.env.NODE_ENV === 'production') {
+    tsConfig = 'tsconfig.prod.json';
+  }
+
+  if (process.env.NODE_ENV === 'test') {
+    tsConfig = 'tsconfig.test.json';
+  }
+
+  const tsConfigEnv = resolveFn(tsConfig);
+
+  if (fs.existsSync(tsConfigEnv)) {
+    return tsConfigEnv;
+  }
+
+  return resolveFn('tsconfig.json');
+}
+
 // config after eject: we're in ./config/
 module.exports = {
   dotenv: resolveApp('.env'),
@@ -83,7 +103,7 @@ module.exports = {
   appIndexJs: resolveModule(resolveApp, 'src/index'),
   appPackageJson: resolveApp('package.json'),
   appSrc: resolveApp('src'),
-  appTsConfig: resolveApp('tsconfig.json'),
+  appTsConfig: getTsConfig(resolveApp),
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveModule(resolveApp, 'src/setupTests'),
   proxySetup: resolveApp('src/setupProxy.ts'),
@@ -105,7 +125,7 @@ module.exports = {
   appIndexJs: resolveModule(resolveApp, 'src/index'),
   appPackageJson: resolveApp('package.json'),
   appSrc: resolveApp('src'),
-  appTsConfig: resolveApp('tsconfig.json'),
+  appTsConfig: getTsConfig(resolveApp),
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveModule(resolveApp, 'src/setupTests'),
   proxySetup: resolveApp('src/setupProxy.ts'),
@@ -139,7 +159,7 @@ if (
     appIndexJs: resolveModule(resolveOwn, 'template/src/index'),
     appPackageJson: resolveOwn('package.json'),
     appSrc: resolveOwn('template/src'),
-    appTsConfig: resolveOwn('template/tsconfig.json'),
+    appTsConfig: getTsConfig(resolveOwn),
     yarnLockFile: resolveOwn('template/yarn.lock'),
     testsSetup: resolveModule(resolveOwn, 'template/src/setupTests'),
     proxySetup: resolveOwn('template/src/setupProxy.ts'),

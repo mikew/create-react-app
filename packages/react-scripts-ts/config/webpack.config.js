@@ -130,8 +130,8 @@ module.exports = function(webpackEnv) {
       // there should be 1 cpu for the fork-ts-checker-webpack-plugin
       workers: require('os').cpus().length - 1,
       // keep workers alive on dev for more effective watch mode
-      poolTimeout: isEnvProduction ? 500 : Infinity
-    }
+      poolTimeout: isEnvProduction ? 500 : Infinity,
+    },
   };
 
   return {
@@ -279,9 +279,8 @@ module.exports = function(webpackEnv) {
       // https://github.com/facebook/create-react-app/issues/290
       // `web` extension prefixes have been added for better support
       // for React Native Web.
-      extensions: paths.moduleFileExtensions
-        .map(ext => `.${ext}`),
-        // .filter(ext => useTypeScript || !ext.includes('ts')),
+      extensions: paths.moduleFileExtensions.map(ext => `.${ext}`),
+      // .filter(ext => useTypeScript || !ext.includes('ts')),
       alias: {
         // Support React Native Web
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
@@ -366,9 +365,9 @@ module.exports = function(webpackEnv) {
                     transpileOnly: true,
                     happyPackMode: true,
                     // getCustomTransformers: require.resolve('./webpack.ts-transformers.js')
-                  }
-                }
-              ]
+                  },
+                },
+              ],
             },
             // Process application JS with Babel.
             // The preset includes JSX, Flow, TypeScript, and some ESnext features.
@@ -648,6 +647,7 @@ module.exports = function(webpackEnv) {
             basedir: paths.appNodeModules,
           }),
           async: false,
+          tslint: paths.appTsLint,
           checkSyntacticErrors: true,
           tsconfig: paths.appTsConfig,
           // compilerOptions: {

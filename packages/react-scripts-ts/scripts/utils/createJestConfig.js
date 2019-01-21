@@ -45,9 +45,12 @@ module.exports = (resolve, rootDir, isEjecting) => {
     testEnvironment: 'jsdom',
     testURL: 'http://localhost',
     transform: {
-      '^.+\\.(js|jsx|ts|tsx)$': isEjecting
-        ? '<rootDir>/node_modules/babel-jest'
-        : resolve('config/jest/babelTransform.js'),
+      '^.+\\.(js|jsx|ts|tsx)$': resolve('config/jest/typescriptTransform.js'),
+      //   ? '<rootDir>/node_modules/babel-jest'
+      //   : resolve('config/jest/babelTransform.js'),
+      // '^.+\\.(js|jsx|ts|tsx)$': isEjecting
+      //   ? '<rootDir>/node_modules/babel-jest'
+      //   : resolve('config/jest/babelTransform.js'),
       '^.+\\.css$': resolve('config/jest/cssTransform.js'),
       '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(
         'config/jest/fileTransform.js'
@@ -61,9 +64,14 @@ module.exports = (resolve, rootDir, isEjecting) => {
       '^react-native$': 'react-native-web',
       '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
     },
-    moduleFileExtensions: [...paths.moduleFileExtensions, 'node'].filter(
+    moduleFileExtensions: [...paths.moduleFileExtensions, 'node', 'd.ts'].filter(
       ext => !ext.includes('mjs')
     ),
+    globals: {
+      'ts-jest': {
+        tsConfig: paths.appTsTestConfig
+      }
+    },
   };
   if (rootDir) {
     config.rootDir = rootDir;
@@ -79,6 +87,7 @@ module.exports = (resolve, rootDir, isEjecting) => {
     'resetModules',
     'snapshotSerializers',
     'watchPathIgnorePatterns',
+    'moduleNameMapper',
   ];
   if (overrides) {
     supportedKeys.forEach(key => {

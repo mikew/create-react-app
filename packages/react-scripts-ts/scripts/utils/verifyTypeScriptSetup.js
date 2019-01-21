@@ -38,6 +38,9 @@ function verifyNoTypeScript() {
 }
 
 function verifyTypeScriptSetup() {
+  return true;
+
+  /*
   let firstTimeSetup = false;
 
   if (!fs.existsSync(paths.appTsConfig)) {
@@ -255,6 +258,7 @@ function verifyTypeScriptSetup() {
       `/// <reference types="react-scripts" />${os.EOL}`
     );
   }
+  */
 }
 
 module.exports = verifyTypeScriptSetup;

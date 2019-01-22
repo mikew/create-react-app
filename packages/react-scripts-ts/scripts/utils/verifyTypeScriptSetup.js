@@ -22,25 +22,25 @@ function writeJson(fileName, object) {
 }
 
 function verifyNoTypeScript() {
-  const typescriptFiles = globby(['**/*.(ts|tsx)', '!**/node_modules'], { cwd: paths.appSrc });
-  if (typescriptFiles.length > 0) {
-    console.warn(
-      chalk.yellow(
-        `We detected TypeScript in your project (${chalk.bold(
-          `src${path.sep}${typescriptFiles[0]}`
-        )}) and created a ${chalk.bold('tsconfig.json')} file for you.`
-      )
-    );
-    console.warn();
-    return false;
-  }
-  return true;
+  return false;
+  // const typescriptFiles = globby(['**/*.(ts|tsx)', '!**/node_modules'], {
+  //   cwd: paths.appSrc,
+  // });
+  // if (typescriptFiles.length > 0) {
+  //   console.warn(
+  //     chalk.yellow(
+  //       `We detected TypeScript in your project (${chalk.bold(
+  //         `src${path.sep}${typescriptFiles[0]}`
+  //       )}) and created a ${chalk.bold('tsconfig.json')} file for you.`
+  //     )
+  //   );
+  //   console.warn();
+  //   return false;
+  // }
+  // return true;
 }
 
 function verifyTypeScriptSetup() {
-  return true;
-
-  /*
   let firstTimeSetup = false;
 
   if (!fs.existsSync(paths.appTsConfig)) {
@@ -106,31 +106,31 @@ function verifyTypeScriptSetup() {
 
     // These values are required and cannot be changed by the user
     // Keep this in sync with the webpack config
-    module: {
-      parsedValue: ts.ModuleKind.ESNext,
-      value: 'esnext',
-      reason: 'for import() and import/export',
-    },
+    // module: {
+    //   parsedValue: ts.ModuleKind.ESNext,
+    //   value: 'esnext',
+    //   reason: 'for import() and import/export',
+    // },
     moduleResolution: {
       parsedValue: ts.ModuleResolutionKind.NodeJs,
       value: 'node',
       reason: 'to match webpack resolution',
     },
     resolveJsonModule: { value: true, reason: 'to match webpack loader' },
-    isolatedModules: { value: true, reason: 'implementation limitation' },
+    // isolatedModules: { value: true, reason: 'implementation limitation' },
     noEmit: { value: true },
-    jsx: {
-      parsedValue: ts.JsxEmit.Preserve,
-      value: 'preserve',
-      reason: 'JSX is compiled by Babel',
-    },
+    // jsx: {
+    //   parsedValue: ts.JsxEmit.Preserve,
+    //   value: 'preserve',
+    //   reason: 'JSX is compiled by Babel',
+    // },
     // We do not support absolute imports, though this may come as a future
     // enhancement
-    baseUrl: {
-      value: undefined,
-      reason: 'absolute imports are not supported (yet)',
-    },
-    paths: { value: undefined, reason: 'aliased imports are not supported' },
+    // baseUrl: {
+    //   value: undefined,
+    //   reason: 'absolute imports are not supported (yet)',
+    // },
+    // paths: { value: undefined, reason: 'aliased imports are not supported' },
   };
 
   const formatDiagnosticHost = {
@@ -258,7 +258,6 @@ function verifyTypeScriptSetup() {
       `/// <reference types="react-scripts" />${os.EOL}`
     );
   }
-  */
 }
 
 module.exports = verifyTypeScriptSetup;

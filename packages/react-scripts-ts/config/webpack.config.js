@@ -352,6 +352,7 @@ module.exports = function(webpackEnv) {
                   loader: require.resolve('ts-loader'),
                   options: {
                     transpileOnly: true,
+                    experimentalWatchApi: true,
                     // getCustomTransformers: require.resolve('./webpack.ts-transformers.js')
                   },
                 },

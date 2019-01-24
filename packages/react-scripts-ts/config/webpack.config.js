@@ -347,7 +347,6 @@ module.exports = function(webpackEnv) {
               include: paths.srcPaths,
               exclude: /[\\/]node_modules[\\/]/,
               use: [
-                threadLoader,
                 // babelLoader,
                 {
                   loader: require.resolve('ts-loader'),

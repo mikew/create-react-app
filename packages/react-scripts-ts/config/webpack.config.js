@@ -638,6 +638,7 @@ module.exports = function(webpackEnv) {
           useTypescriptIncrementalApi: true,
           checkSyntacticErrors: true,
           tsconfig: paths.appTsConfig,
+          tslint: paths.appTsLint,
           reportFiles: [
             '**',
             '!**/*.json',

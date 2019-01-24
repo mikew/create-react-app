@@ -150,11 +150,12 @@ function createCompiler(
       });
     });
 
-    compiler.hooks.compilation.tap('compilation', async compilation => {
-      const messages = await tsMessagesPromise;
-      compilation.errors.push(...messages.errors);
-      compilation.warnings.push(...messages.warnings);
-    });
+    // compiler.hooks.compilation.tap('compilation', async compilation => {
+    //   const messages = await tsMessagesPromise;
+    //   compilation.errors.push(...messages.errors);
+    //   compilation.warnings.push(...messages.warnings);
+    //   console.log('compiler.hooks.compilation');
+    // });
 
     forkTsCheckerWebpackPlugin
       .getCompilerHooks(compiler)
@@ -184,22 +185,22 @@ function createCompiler(
     // them in a readable focused way.
     // We only construct the warnings and errors for speed:
     // https://github.com/facebook/create-react-app/issues/4492#issuecomment-421959548
-    const statsData = stats.toJson({
-      all: false,
-      warnings: true,
-      errors: true,
-    });
-
-    if (useTypeScript && statsData.errors.length === 0 && isTsCheckInProgress) {
+    // const statsData = stats.toJson({
+    //   all: false,
+    //   warnings: true,
+    //   errors: true,
+    // });
+    const messages = await tsMessagesPromise;
+    if (useTypeScript && messages.errors.length === 0 && isTsCheckInProgress) {
       console.log(
         chalk.yellow(
           'Files successfully emitted, waiting for typecheck results...'
         )
       );
 
-      const messages = await tsMessagesPromise;
-      statsData.errors.push(...messages.errors);
-      statsData.warnings.push(...messages.warnings);
+      // const messages = await tsMessagesPromise;
+      // statsData.errors.push(...messages.errors);
+      // statsData.warnings.push(...messages.warnings);
 
       if (messages.errors.length > 0) {
         devSocket.errors(messages.errors);
@@ -212,7 +213,7 @@ function createCompiler(
       }
     }
 
-    const messages = formatWebpackMessages(statsData);
+    // const messages = formatWebpackMessages(statsData);
     const isSuccessful = !messages.errors.length && !messages.warnings.length;
     if (isSuccessful) {
       console.log(chalk.green('Compiled successfully!'));

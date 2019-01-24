@@ -124,16 +124,6 @@ module.exports = function(webpackEnv) {
     return loaders;
   };
 
-  const threadLoader = {
-    loader: require.resolve('thread-loader'),
-    options: {
-      // there should be 1 cpu for the fork-ts-checker-webpack-plugin
-      workers: require('os').cpus().length - 1,
-      // keep workers alive on dev for more effective watch mode
-      poolTimeout: isEnvProduction ? 500 : Infinity,
-    },
-  };
-
   return {
     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
     // Stop compilation early in production
@@ -363,7 +353,6 @@ module.exports = function(webpackEnv) {
                   loader: require.resolve('ts-loader'),
                   options: {
                     transpileOnly: true,
-                    happyPackMode: true,
                     // getCustomTransformers: require.resolve('./webpack.ts-transformers.js')
                   },
                 },
@@ -646,18 +635,10 @@ module.exports = function(webpackEnv) {
           typescript: resolve.sync('typescript', {
             basedir: paths.appNodeModules,
           }),
-          async: false,
-          tslint: paths.appTsLint,
+          async: isEnvDevelopment,
+          useTypescriptIncrementalApi: true,
           checkSyntacticErrors: true,
           tsconfig: paths.appTsConfig,
-          // compilerOptions: {
-          //   module: 'esnext',
-          //   moduleResolution: 'node',
-          //   resolveJsonModule: true,
-          //   isolatedModules: true,
-          //   noEmit: true,
-          //   jsx: 'preserve',
-          // },
           reportFiles: [
             '**',
             '!**/*.json',
@@ -668,7 +649,8 @@ module.exports = function(webpackEnv) {
           ],
           watch: paths.appSrc,
           silent: true,
-          formatter: typescriptFormatter,
+          // The formatter is invoked directly in WebpackDevServerUtils during development
+          formatter: isEnvProduction ? typescriptFormatter : undefined,
         }),
     ].filter(Boolean),
     // Some libraries import Node modules but don't use them in the browser.

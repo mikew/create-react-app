@@ -110,7 +110,8 @@ checkBrowsers(paths.appPath, isInteractive)
       urls,
       useYarn,
       useTypeScript,
-      devSocket
+      devSocket,
+      require('fork-ts-checker-webpack-plugin')
     );
     // Load proxy config
     const proxySetting = require(paths.appPackageJson).proxy;

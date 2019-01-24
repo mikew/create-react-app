@@ -18,7 +18,6 @@ const clearConsole = require('./clearConsole');
 const formatWebpackMessages = require('./formatWebpackMessages');
 const getProcessForPort = require('./getProcessForPort');
 const typescriptFormatter = require('./typescriptFormatter');
-const forkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const isInteractive = process.stdout.isTTY;
 
@@ -108,7 +107,8 @@ function createCompiler(
   urls,
   useYarn,
   useTypeScript,
-  devSocket
+  devSocket,
+  forkTsCheckerWebpackPlugin
 ) {
   // "Compiler" is a low-level interface to Webpack.
   // It lets us listen to some events and provide our own custom messages.

@@ -97,6 +97,13 @@ checkBrowsers(paths.appPath, isInteractive)
     const useTypeScript = fs.existsSync(paths.appTsConfig);
     const urls = prepareUrls(protocol, HOST, port);
     const devSocket = {
+      ok: () => devServer.sockWrite(devServer.sockets, 'ok'),
+      isWaitingTypeScript: inProgress =>
+        devServer.sockWrite(
+          devServer.sockets,
+          'is-waiting-typescript',
+          inProgress
+        ),
       warnings: warnings =>
         devServer.sockWrite(devServer.sockets, 'warnings', warnings),
       errors: errors =>

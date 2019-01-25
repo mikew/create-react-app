@@ -83,6 +83,7 @@ connection.onclose = function() {
 var isFirstCompilation = true;
 var mostRecentCompilationHash = null;
 var hasCompileErrors = false;
+var isWaitingTypeScript = false;
 
 function clearOutdatedErrors() {
   // Clean up outdated compile errors, if any.
@@ -206,6 +207,9 @@ connection.onmessage = function(e) {
     case 'errors':
       handleErrors(message.data);
       break;
+    case 'is-waiting-typescript':
+      isWaitingTypeScript = message.data;
+      break;
     default:
     // Do nothing.
   }
@@ -221,6 +225,10 @@ function isUpdateAvailable() {
 
 // Webpack disallows updates in other states.
 function canApplyUpdates() {
+  if (isWaitingTypeScript) {
+    return false;
+  }
+
   return module.hot.status() === 'idle';
 }
 

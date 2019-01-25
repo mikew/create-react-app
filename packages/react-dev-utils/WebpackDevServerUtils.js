@@ -135,31 +135,21 @@ function createCompiler(
   });
 
   let isFirstCompile = true;
-  let isTsCheckInProgress = false;
   let tsMessagesPromise;
   let tsMessagesResolver;
 
   if (useTypeScript) {
     compiler.hooks.beforeCompile.tap('beforeCompile', () => {
-      isTsCheckInProgress = true;
       if (!isFirstCompile) {
         devSocket.isWaitingTypeScript(true);
       }
 
       tsMessagesPromise = new Promise(resolve => {
         tsMessagesResolver = msgs => {
-          isTsCheckInProgress = false;
           resolve(msgs);
         };
       });
     });
-
-    // compiler.hooks.compilation.tap('compilation', async compilation => {
-    //   const messages = await tsMessagesPromise;
-    //   compilation.errors.push(...messages.errors);
-    //   compilation.warnings.push(...messages.warnings);
-    //   console.log('compiler.hooks.compilation');
-    // });
 
     forkTsCheckerWebpackPlugin
       .getCompilerHooks(compiler)

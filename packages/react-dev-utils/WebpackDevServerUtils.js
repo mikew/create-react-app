@@ -166,7 +166,7 @@ function createCompiler(
 
   // "done" event fires when Webpack has finished recompiling the bundle.
   // Whether or not you have warnings or errors, you will get this event.
-  compiler.hooks.done.tap('done', async stats => {
+  compiler.hooks.done.tap('done', stats => {
     if (useTypeScript) {
       if (isInteractive) {
         clearConsole();
@@ -188,72 +188,48 @@ function createCompiler(
       stats.toJson({ all: false, warnings: true, errors: true })
     );
 
-    if (useTypeScript) {
-      const asyncMessages = await tsMessagesPromise;
+    (tsMessagesPromise || Promise.resolve({ errors: [], warnings: [] })).then(
+      asyncMessages => {
+        // Push errors and warnings into compilation result
+        // to show them after page refresh triggered by user.
+        // This is important for errors on first run in development.
+        // TODO obvi won't work in async context.
+        stats.compilation.errors.push(...asyncMessages.errors);
+        stats.compilation.warnings.push(...asyncMessages.warnings);
 
-      // Push errors and warnings into compilation result
-      // to show them after page refresh triggered by user.
-      // This is important for errors on first run in development.
-      stats.compilation.errors.push(...asyncMessages.errors);
-      stats.compilation.warnings.push(...asyncMessages.warnings);
+        // TODO obvi won't work in async context.
+        messages.errors.push(...asyncMessages.errors);
+        messages.warnings.push(...asyncMessages.warnings);
 
-      messages.errors.push(...asyncMessages.errors);
-      messages.warnings.push(...asyncMessages.warnings);
+        if (useTypeScript && isInteractive) {
+          clearConsole();
+        }
 
-      if (asyncMessages.errors.length > 0) {
-        devSocketWrite('errors', asyncMessages.errors);
-      } else if (asyncMessages.warnings.length > 0) {
-        devSocketWrite('warnings', asyncMessages.warnings);
-      } else {
-        // We have to notify the hot dev client when we are waiting for types
-        // when `module.hot` is being used.
-        devSocketWrite('wait-for-types', false);
-        devSocketWrite('ok');
+        logCompilationMessages(asyncMessages);
+
+        const isSuccessful =
+          !messages.errors.length && !messages.warnings.length;
+        if (isSuccessful) {
+          console.log(chalk.green('Compiled successfully!'));
+        }
+        if (isSuccessful && (isInteractive || isFirstCompile)) {
+          printInstructions(appName, urls, useYarn);
+        }
+
+        if (asyncMessages.errors.length > 0) {
+          devSocketWrite('errors', asyncMessages.errors);
+        } else if (asyncMessages.warnings.length > 0) {
+          devSocketWrite('warnings', asyncMessages.warnings);
+        } else {
+          // We have to notify the hot dev client when we are waiting for types
+          // when `module.hot` is being used.
+          devSocketWrite('wait-for-types', false);
+          devSocketWrite('ok');
+        }
+
+        isFirstCompile = false;
       }
-    }
-
-    if (useTypeScript && isInteractive) {
-      clearConsole();
-    }
-
-    const isSuccessful = !messages.errors.length && !messages.warnings.length;
-    if (isSuccessful) {
-      console.log(chalk.green('Compiled successfully!'));
-    }
-    if (isSuccessful && (isInteractive || isFirstCompile)) {
-      printInstructions(appName, urls, useYarn);
-    }
-    isFirstCompile = false;
-
-    // If errors exist, only show errors.
-    if (messages.errors.length) {
-      // Only keep the first error. Others are often indicative
-      // of the same problem, but confuse the reader with noise.
-      if (messages.errors.length > 1) {
-        messages.errors.length = 1;
-      }
-      console.log(chalk.red('Failed to compile.\n'));
-      console.log(messages.errors.join('\n\n'));
-      return;
-    }
-
-    // Show warnings if no errors were found.
-    if (messages.warnings.length) {
-      console.log(chalk.yellow('Compiled with warnings.\n'));
-      console.log(messages.warnings.join('\n\n'));
-
-      // Teach some ESLint tricks.
-      console.log(
-        '\nSearch for the ' +
-          chalk.underline(chalk.yellow('keywords')) +
-          ' to learn more about each warning.'
-      );
-      console.log(
-        'To ignore, add ' +
-          chalk.cyan('// eslint-disable-next-line') +
-          ' to the line before.\n'
-      );
-    }
+    );
   });
 
   // You can safely remove this after ejecting.
@@ -277,6 +253,38 @@ function createCompiler(
   }
 
   return compiler;
+}
+
+function logCompilationMessages(messages) {
+  // If errors exist, only show errors.
+  if (messages.errors.length) {
+    // Only keep the first error. Others are often indicative
+    // of the same problem, but confuse the reader with noise.
+    if (messages.errors.length > 1) {
+      messages.errors.length = 1;
+    }
+    console.log(chalk.red('Failed to compile.\n'));
+    console.log(messages.errors.join('\n\n'));
+    return;
+  }
+
+  // Show warnings if no errors were found.
+  if (messages.warnings.length) {
+    console.log(chalk.yellow('Compiled with warnings.\n'));
+    console.log(messages.warnings.join('\n\n'));
+
+    // Teach some ESLint tricks.
+    console.log(
+      '\nSearch for the ' +
+        chalk.underline(chalk.yellow('keywords')) +
+        ' to learn more about each warning.'
+    );
+    console.log(
+      'To ignore, add ' +
+        chalk.cyan('// eslint-disable-next-line') +
+        ' to the line before.\n'
+    );
+  }
 }
 
 function resolveLoopback(proxy) {

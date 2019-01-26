@@ -224,7 +224,7 @@ function createCompiler(
           // We have to notify the hot dev client when we are waiting for types
           // when `module.hot` is being used.
           devSocketWrite('wait-for-types', false);
-          devSocketWrite('ok');
+          devSocketWrite('dismiss-build-error');
         }
 
         isFirstCompile = false;

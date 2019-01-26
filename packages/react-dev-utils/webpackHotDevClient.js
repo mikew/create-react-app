@@ -107,7 +107,7 @@ function handleSuccess() {
     tryApplyUpdates(function onHotUpdateSuccess() {
       // Only dismiss it when we're sure it's a hot update.
       // Otherwise it would flicker right before the reload.
-      ErrorOverlay.dismissBuildError();
+      dismissBuildErrorIFNotWaiting();
     });
   }
 }
@@ -148,7 +148,7 @@ function handleWarnings(warnings) {
     tryApplyUpdates(function onSuccessfulHotUpdate() {
       // Only dismiss it when we're sure it's a hot update.
       // Otherwise it would flicker right before the reload.
-      ErrorOverlay.dismissBuildError();
+      dismissBuildErrorIFNotWaiting();
     });
   }
 }
@@ -186,6 +186,14 @@ function handleAvailableHash(hash) {
   mostRecentCompilationHash = hash;
 }
 
+function dismissBuildErrorIFNotWaiting() {
+  if (isWaitingForTypes) {
+    return;
+  }
+
+  ErrorOverlay.dismissBuildError();
+}
+
 // Handle messages from the server.
 connection.onmessage = function(e) {
   var message = JSON.parse(e.data);
@@ -207,6 +215,9 @@ connection.onmessage = function(e) {
     case 'wait-for-types':
       isWaitingForTypes = message.data;
       break;
+    case 'dismiss-build-error':
+      ErrorOverlay.dismissBuildError();
+      break;
     case 'errors':
       handleErrors(message.data);
       break;
@@ -225,7 +236,7 @@ function isUpdateAvailable() {
 
 // Webpack disallows updates in other states.
 function canApplyUpdates() {
-  return module.hot.status() === 'idle' && !isWaitingForTypes;
+  return module.hot.status() === 'idle';
 }
 
 // Attempt to update code on the fly, fall back to a hard reload.

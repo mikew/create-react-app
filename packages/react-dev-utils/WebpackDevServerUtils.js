@@ -108,7 +108,7 @@ function createCompiler(
   urls,
   useYarn,
   useTypeScript,
-  devSocket
+  devSocketWrite
 ) {
   // "Compiler" is a low-level interface to Webpack.
   // It lets us listen to some events and provide our own custom messages.
@@ -140,6 +140,9 @@ function createCompiler(
 
   if (useTypeScript) {
     compiler.hooks.beforeCompile.tap('beforeCompile', () => {
+      if (!isFirstCompile) {
+        devSocketWrite('wait-for-types', true);
+      }
       tsMessagesPromise = new Promise(resolve => {
         tsMessagesResolver = msgs => resolve(msgs);
       });
@@ -164,8 +167,16 @@ function createCompiler(
   // "done" event fires when Webpack has finished recompiling the bundle.
   // Whether or not you have warnings or errors, you will get this event.
   compiler.hooks.done.tap('done', async stats => {
-    if (isInteractive) {
-      clearConsole();
+    if (useTypeScript) {
+      if (isInteractive) {
+        clearConsole();
+      }
+
+      console.log(
+        chalk.yellow(
+          'Files successfully emitted, waiting for typecheck results...'
+        )
+      );
     }
 
     // We have switched off the default Webpack output in WebpackDevServer
@@ -173,43 +184,38 @@ function createCompiler(
     // them in a readable focused way.
     // We only construct the warnings and errors for speed:
     // https://github.com/facebook/create-react-app/issues/4492#issuecomment-421959548
-    const statsData = stats.toJson({
-      all: false,
-      warnings: true,
-      errors: true,
-    });
+    const messages = formatWebpackMessages(
+      stats.toJson({ all: false, warnings: true, errors: true })
+    );
 
-    if (useTypeScript && statsData.errors.length === 0) {
-      const delayedMsg = setTimeout(() => {
-        console.log(
-          chalk.yellow(
-            'Files successfully emitted, waiting for typecheck results...'
-          )
-        );
-      }, 100);
-
-      const messages = await tsMessagesPromise;
-      clearTimeout(delayedMsg);
-      statsData.errors.push(...messages.errors);
-      statsData.warnings.push(...messages.warnings);
+    if (useTypeScript) {
+      const asyncMessages = await tsMessagesPromise;
 
       // Push errors and warnings into compilation result
       // to show them after page refresh triggered by user.
-      stats.compilation.errors.push(...messages.errors);
-      stats.compilation.warnings.push(...messages.warnings);
+      // This is important for errors on first run in development.
+      stats.compilation.errors.push(...asyncMessages.errors);
+      stats.compilation.warnings.push(...asyncMessages.warnings);
 
-      if (messages.errors.length > 0) {
-        devSocket.errors(messages.errors);
-      } else if (messages.warnings.length > 0) {
-        devSocket.warnings(messages.warnings);
-      }
+      messages.errors.push(...asyncMessages.errors);
+      messages.warnings.push(...asyncMessages.warnings);
 
-      if (isInteractive) {
-        clearConsole();
+      if (asyncMessages.errors.length > 0) {
+        devSocketWrite('errors', asyncMessages.errors);
+      } else if (asyncMessages.warnings.length > 0) {
+        devSocketWrite('warnings', asyncMessages.warnings);
+      } else {
+        // We have to notify the hot dev client when we are waiting for types
+        // when `module.hot` is being used.
+        devSocketWrite('wait-for-types', false);
+        devSocketWrite('ok');
       }
     }
 
-    const messages = formatWebpackMessages(statsData);
+    if (useTypeScript && isInteractive) {
+      clearConsole();
+    }
+
     const isSuccessful = !messages.errors.length && !messages.warnings.length;
     if (isSuccessful) {
       console.log(chalk.green('Compiled successfully!'));

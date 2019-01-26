@@ -83,6 +83,7 @@ connection.onclose = function() {
 var isFirstCompilation = true;
 var mostRecentCompilationHash = null;
 var hasCompileErrors = false;
+var isWaitingForTypes = false;
 
 function clearOutdatedErrors() {
   // Clean up outdated compile errors, if any.
@@ -203,6 +204,9 @@ connection.onmessage = function(e) {
     case 'warnings':
       handleWarnings(message.data);
       break;
+    case 'wait-for-types':
+      isWaitingForTypes = message.data;
+      break;
     case 'errors':
       handleErrors(message.data);
       break;
@@ -221,7 +225,7 @@ function isUpdateAvailable() {
 
 // Webpack disallows updates in other states.
 function canApplyUpdates() {
-  return module.hot.status() === 'idle';
+  return module.hot.status() === 'idle' && !isWaitingForTypes;
 }
 
 // Attempt to update code on the fly, fall back to a hard reload.

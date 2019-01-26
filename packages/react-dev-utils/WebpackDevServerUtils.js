@@ -187,21 +187,21 @@ function createCompiler(
     const messages = formatWebpackMessages(
       stats.toJson({ all: false, warnings: true, errors: true })
     );
+    const alreadyHadErrors = messages.errors.length > 0;
+    logCompilationMessages(messages);
 
     (tsMessagesPromise || Promise.resolve({ errors: [], warnings: [] })).then(
       asyncMessages => {
         // Push errors and warnings into compilation result
         // to show them after page refresh triggered by user.
         // This is important for errors on first run in development.
-        // TODO obvi won't work in async context.
         stats.compilation.errors.push(...asyncMessages.errors);
         stats.compilation.warnings.push(...asyncMessages.warnings);
 
-        // TODO obvi won't work in async context.
         messages.errors.push(...asyncMessages.errors);
         messages.warnings.push(...asyncMessages.warnings);
 
-        if (useTypeScript && isInteractive) {
+        if (useTypeScript && isInteractive && !alreadyHadErrors) {
           clearConsole();
         }
 
@@ -224,7 +224,9 @@ function createCompiler(
           // We have to notify the hot dev client when we are waiting for types
           // when `module.hot` is being used.
           devSocketWrite('wait-for-types', false);
-          devSocketWrite('dismiss-build-error');
+          if (!alreadyHadErrors) {
+            devSocketWrite('dismiss-build-error');
+          }
         }
 
         isFirstCompile = false;

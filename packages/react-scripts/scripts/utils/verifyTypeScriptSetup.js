@@ -99,6 +99,8 @@ function verifyTypeScriptSetup() {
     allowSyntheticDefaultImports: { suggested: true },
     strict: { suggested: true },
     forceConsistentCasingInFileNames: { suggested: true },
+    jsx: { suggested: 'react' },
+    sourceMap: { suggested: true },
     baseUrl: { suggested: '.' },
     paths: {
       suggested: {
@@ -110,29 +112,29 @@ function verifyTypeScriptSetup() {
     // Keep this in sync with the webpack config
     module: {
       parsedValue: ts.ModuleKind.ESNext,
-      value: 'esnext',
+      suggested: 'esnext',
       reason: 'for import() and import/export',
     },
     moduleResolution: {
       parsedValue: ts.ModuleResolutionKind.NodeJs,
-      value: 'node',
+      suggested: 'node',
       reason: 'to match webpack resolution',
     },
-    resolveJsonModule: { value: true, reason: 'to match webpack loader' },
-    isolatedModules: { value: true, reason: 'implementation limitation' },
+    resolveJsonModule: { suggested: true, reason: 'to match webpack loader' },
+    // isolatedModules: { value: true, reason: 'implementation limitation' },
     noEmit: { value: true },
-    jsx: {
-      parsedValue: ts.JsxEmit.Preserve,
-      value: 'preserve',
-      reason: 'JSX is compiled by Babel',
-    },
+    // jsx: {
+    //   parsedValue: ts.JsxEmit.Preserve,
+    //   value: 'preserve',
+    //   reason: 'JSX is compiled by Babel',
+    // },
     // We do not support absolute imports, though this may come as a future
     // enhancement
-    baseUrl: {
-      value: undefined,
-      reason: 'absolute imports are not supported (yet)',
-    },
-    paths: { value: undefined, reason: 'aliased imports are not supported' },
+    // baseUrl: {
+    //   value: undefined,
+    //   reason: 'absolute imports are not supported (yet)',
+    // },
+    // paths: { value: undefined, reason: 'aliased imports are not supported' },
   };
 
   const formatDiagnosticHost = {

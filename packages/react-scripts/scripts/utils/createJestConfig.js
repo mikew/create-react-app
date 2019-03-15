@@ -10,6 +10,7 @@
 const fs = require('fs');
 const chalk = require('react-dev-utils/chalk');
 const paths = require('../../config/paths');
+const getTypescriptCompilerPath = require('./getTypescriptCompilerPath');
 
 module.exports = (resolve, rootDir, isEjecting) => {
   // Use this instead of `paths.testsSetup` to avoid putting
@@ -20,6 +21,7 @@ module.exports = (resolve, rootDir, isEjecting) => {
   const setupTestsFile = fs.existsSync(paths.testsSetup)
     ? `<rootDir>/src/setupTests.${setupTestsFileExtension}`
     : undefined;
+  const typescriptCompilerPath = getTypescriptCompilerPath();
 
   const config = {
     collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
@@ -45,9 +47,10 @@ module.exports = (resolve, rootDir, isEjecting) => {
     testEnvironment: 'jsdom',
     testURL: 'http://localhost',
     transform: {
-      '^.+\\.(js|jsx|ts|tsx)$': isEjecting
-        ? '<rootDir>/node_modules/babel-jest'
-        : resolve('config/jest/babelTransform.js'),
+      // '^.+\\.(js|jsx|ts|tsx)$': isEjecting
+      //   ? '<rootDir>/node_modules/babel-jest'
+      //   : resolve('config/jest/babelTransform.js'),
+      '^.+\\.(js|jsx|ts|tsx)$': require.resolve('ts-jest'),
       '^.+\\.css$': resolve('config/jest/cssTransform.js'),
       '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(
         'config/jest/fileTransform.js'
@@ -61,13 +64,21 @@ module.exports = (resolve, rootDir, isEjecting) => {
       '^react-native$': 'react-native-web',
       '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
     },
-    moduleFileExtensions: [...paths.moduleFileExtensions, 'node'].filter(
-      ext => !ext.includes('mjs')
-    ),
+    moduleFileExtensions: [
+      ...paths.moduleFileExtensions,
+      'node',
+      'd.ts',
+    ].filter(ext => !ext.includes('mjs')),
     watchPlugins: [
       require.resolve('jest-watch-typeahead/filename'),
       require.resolve('jest-watch-typeahead/testname'),
     ],
+    globals: {
+      'ts-jest': {
+        tsConfig: paths.appTsConfig,
+        compiler: typescriptCompilerPath,
+      },
+    },
   };
   if (rootDir) {
     config.rootDir = rootDir;

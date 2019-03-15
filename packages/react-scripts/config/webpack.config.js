@@ -31,6 +31,7 @@ const getClientEnvironment = require('./env');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
+const getTypescriptCompilerPath = require('../scripts/utils/getTypescriptCompilerPath');
 // @remove-on-eject-begin
 const getCacheIdentifier = require('react-dev-utils/getCacheIdentifier');
 // @remove-on-eject-end
@@ -74,6 +75,9 @@ module.exports = function(webpackEnv) {
     : isEnvDevelopment && '';
   // Get environment variables to inject into our app.
   const env = getClientEnvironment(publicUrl);
+  const typescriptCompilerPath = useTypeScript
+    ? getTypescriptCompilerPath()
+    : undefined;
 
   // common function to get style loaders
   const getStyleLoaders = (cssOptions, preProcessor) => {
@@ -340,95 +344,113 @@ module.exports = function(webpackEnv) {
                 name: 'static/media/[name].[hash:8].[ext]',
               },
             },
+            // Process TypeScript
+            {
+              test: /\.tsx?$/,
+              include: paths.srcPaths,
+              exclude: /[\\/]node_modules[\\/]/,
+              use: [
+                {
+                  loader: require.resolve('ts-loader'),
+                  options: {
+                    happyPackMode: isEnvProduction,
+                    transpileOnly: true,
+                    configFile: paths.appTsConfig,
+                    compiler: typescriptCompilerPath,
+                    // getCustomTransformers: require.resolve('./webpack.ts-transformers.js')
+                  },
+                },
+              ].filter(Boolean),
+            },
             // Process application JS with Babel.
             // The preset includes JSX, Flow, TypeScript, and some ESnext features.
-            {
-              test: /\.(js|mjs|jsx|ts|tsx)$/,
-              include: paths.appSrc,
-              loader: require.resolve('babel-loader'),
-              options: {
-                customize: require.resolve(
-                  'babel-preset-react-app/webpack-overrides'
-                ),
-                // @remove-on-eject-begin
-                babelrc: false,
-                configFile: false,
-                presets: [require.resolve('babel-preset-react-app')],
-                // Make sure we have a unique cache identifier, erring on the
-                // side of caution.
-                // We remove this when the user ejects because the default
-                // is sane and uses Babel options. Instead of options, we use
-                // the react-scripts and babel-preset-react-app versions.
-                cacheIdentifier: getCacheIdentifier(
-                  isEnvProduction
-                    ? 'production'
-                    : isEnvDevelopment && 'development',
-                  [
-                    'babel-plugin-named-asset-import',
-                    'babel-preset-react-app',
-                    'react-dev-utils',
-                    'react-scripts',
-                  ]
-                ),
-                // @remove-on-eject-end
-                plugins: [
-                  [
-                    require.resolve('babel-plugin-named-asset-import'),
-                    {
-                      loaderMap: {
-                        svg: {
-                          ReactComponent: '@svgr/webpack?-svgo,+ref![path]',
-                        },
-                      },
-                    },
-                  ],
-                ],
-                // This is a feature of `babel-loader` for webpack (not Babel itself).
-                // It enables caching results in ./node_modules/.cache/babel-loader/
-                // directory for faster rebuilds.
-                cacheDirectory: true,
-                cacheCompression: isEnvProduction,
-                compact: isEnvProduction,
-              },
-            },
+            // {
+            //   test: /\.(js|mjs|jsx|ts|tsx)$/,
+            //   include: paths.appSrc,
+            //   loader: require.resolve('babel-loader'),
+            //   options: {
+            //     customize: require.resolve(
+            //       'babel-preset-react-app/webpack-overrides'
+            //     ),
+            //     // @remove-on-eject-begin
+            //     babelrc: false,
+            //     configFile: false,
+            //     presets: [require.resolve('babel-preset-react-app')],
+            //     // Make sure we have a unique cache identifier, erring on the
+            //     // side of caution.
+            //     // We remove this when the user ejects because the default
+            //     // is sane and uses Babel options. Instead of options, we use
+            //     // the react-scripts and babel-preset-react-app versions.
+            //     cacheIdentifier: getCacheIdentifier(
+            //       isEnvProduction
+            //         ? 'production'
+            //         : isEnvDevelopment && 'development',
+            //       [
+            //         'babel-plugin-named-asset-import',
+            //         'babel-preset-react-app',
+            //         'react-dev-utils',
+            //         'react-scripts',
+            //       ]
+            //     ),
+            //     // @remove-on-eject-end
+            //     plugins: [
+            //       [
+            //         require.resolve('babel-plugin-named-asset-import'),
+            //         {
+            //           loaderMap: {
+            //             svg: {
+            //               ReactComponent: '@svgr/webpack?-svgo![path]',
+            //             },
+            //           },
+            //         },
+            //       ],
+            //     ],
+            //     // This is a feature of `babel-loader` for webpack (not Babel itself).
+            //     // It enables caching results in ./node_modules/.cache/babel-loader/
+            //     // directory for faster rebuilds.
+            //     cacheDirectory: true,
+            //     cacheCompression: isEnvProduction,
+            //     compact: isEnvProduction,
+            //   },
+            // },
             // Process any JS outside of the app with Babel.
             // Unlike the application JS, we only compile the standard ES features.
-            {
-              test: /\.(js|mjs)$/,
-              exclude: /@babel(?:\/|\\{1,2})runtime/,
-              loader: require.resolve('babel-loader'),
-              options: {
-                babelrc: false,
-                configFile: false,
-                compact: false,
-                presets: [
-                  [
-                    require.resolve('babel-preset-react-app/dependencies'),
-                    { helpers: true },
-                  ],
-                ],
-                cacheDirectory: true,
-                cacheCompression: isEnvProduction,
-                // @remove-on-eject-begin
-                cacheIdentifier: getCacheIdentifier(
-                  isEnvProduction
-                    ? 'production'
-                    : isEnvDevelopment && 'development',
-                  [
-                    'babel-plugin-named-asset-import',
-                    'babel-preset-react-app',
-                    'react-dev-utils',
-                    'react-scripts',
-                  ]
-                ),
-                // @remove-on-eject-end
-                // If an error happens in a package, it's possible to be
-                // because it was compiled. Thus, we don't want the browser
-                // debugger to show the original code. Instead, the code
-                // being evaluated would be much more helpful.
-                sourceMaps: false,
-              },
-            },
+            // {
+            //   test: /\.(js|mjs)$/,
+            //   exclude: /@babel(?:\/|\\{1,2})runtime/,
+            //   loader: require.resolve('babel-loader'),
+            //   options: {
+            //     babelrc: false,
+            //     configFile: false,
+            //     compact: false,
+            //     presets: [
+            //       [
+            //         require.resolve('babel-preset-react-app/dependencies'),
+            //         { helpers: true },
+            //       ],
+            //     ],
+            //     cacheDirectory: true,
+            //     cacheCompression: isEnvProduction,
+            //     // @remove-on-eject-begin
+            //     cacheIdentifier: getCacheIdentifier(
+            //       isEnvProduction
+            //         ? 'production'
+            //         : isEnvDevelopment && 'development',
+            //       [
+            //         'babel-plugin-named-asset-import',
+            //         'babel-preset-react-app',
+            //         'react-dev-utils',
+            //         'react-scripts',
+            //       ]
+            //     ),
+            //     // @remove-on-eject-end
+            //     // If an error happens in a package, it's possible to be
+            //     // because it was compiled. Thus, we don't want the browser
+            //     // debugger to show the original code. Instead, the code
+            //     // being evaluated would be much more helpful.
+            //     sourceMaps: false,
+            //   },
+            // },
             // "postcss" loader applies autoprefixer to our CSS.
             // "css" loader resolves paths in CSS and adds assets as dependencies.
             // "style" loader turns CSS into JS modules that inject <style> tags.
@@ -614,9 +636,7 @@ module.exports = function(webpackEnv) {
       // TypeScript type checking
       useTypeScript &&
         new ForkTsCheckerWebpackPlugin({
-          typescript: resolve.sync('typescript', {
-            basedir: paths.appNodeModules,
-          }),
+          typescript: typescriptCompilerPath,
           async: isEnvDevelopment,
           useTypescriptIncrementalApi: true,
           checkSyntacticErrors: true,

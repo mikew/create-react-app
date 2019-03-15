@@ -99,6 +99,12 @@ function verifyTypeScriptSetup() {
     allowSyntheticDefaultImports: { suggested: true },
     strict: { suggested: true },
     forceConsistentCasingInFileNames: { suggested: true },
+    baseUrl: { suggested: '.' },
+    paths: {
+      suggested: {
+        '@src/*': ['src/*'],
+      },
+    },
 
     // These values are required and cannot be changed by the user
     // Keep this in sync with the webpack config

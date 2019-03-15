@@ -9,6 +9,7 @@
 
 const fs = require('fs');
 const chalk = require('react-dev-utils/chalk');
+const { pathsToModuleNameMapper } = require('ts-jest/utils');
 const paths = require('../../config/paths');
 const getTypescriptCompilerPath = require('./getTypescriptCompilerPath');
 
@@ -22,6 +23,12 @@ module.exports = (resolve, rootDir, isEjecting) => {
     ? `<rootDir>/src/setupTests.${setupTestsFileExtension}`
     : undefined;
   const typescriptCompilerPath = getTypescriptCompilerPath();
+  const typescript = require(typescriptCompilerPath);
+  const tsConfig = typescript.getParsedCommandLineOfConfigFile(
+    paths.appTsConfig,
+    undefined,
+    typescript.sys
+  );
 
   const config = {
     collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
@@ -63,6 +70,9 @@ module.exports = (resolve, rootDir, isEjecting) => {
     moduleNameMapper: {
       '^react-native$': 'react-native-web',
       '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
+      ...pathsToModuleNameMapper(tsConfig.options.paths || {}, {
+        prefix: '<rootDir>',
+      }),
     },
     moduleFileExtensions: [
       ...paths.moduleFileExtensions,

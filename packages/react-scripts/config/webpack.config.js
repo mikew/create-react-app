@@ -94,27 +94,27 @@ module.exports = function(webpackEnv) {
         loader: require.resolve('css-loader'),
         options: cssOptions,
       },
-      {
-        // Options for PostCSS as we reference these options twice
-        // Adds vendor prefixing based on your specified browser support in
-        // package.json
-        loader: require.resolve('postcss-loader'),
-        options: {
-          // Necessary for external CSS imports to work
-          // https://github.com/facebook/create-react-app/issues/2677
-          ident: 'postcss',
-          plugins: () => [
-            require('postcss-flexbugs-fixes'),
-            require('postcss-preset-env')({
-              autoprefixer: {
-                flexbox: 'no-2009',
-              },
-              stage: 3,
-            }),
-          ],
-          sourceMap: isEnvProduction && shouldUseSourceMap,
-        },
-      },
+      // {
+      //   // Options for PostCSS as we reference these options twice
+      //   // Adds vendor prefixing based on your specified browser support in
+      //   // package.json
+      //   loader: require.resolve('postcss-loader'),
+      //   options: {
+      //     // Necessary for external CSS imports to work
+      //     // https://github.com/facebook/create-react-app/issues/2677
+      //     ident: 'postcss',
+      //     plugins: () => [
+      //       require('postcss-flexbugs-fixes'),
+      //       require('postcss-preset-env')({
+      //         autoprefixer: {
+      //           flexbox: 'no-2009',
+      //         },
+      //         stage: 3,
+      //       }),
+      //     ],
+      //     sourceMap: isEnvProduction && shouldUseSourceMap,
+      //   },
+      // },
     ].filter(Boolean);
     if (preProcessor) {
       loaders.push({
@@ -507,36 +507,36 @@ module.exports = function(webpackEnv) {
             // Opt-in support for SASS (using .scss or .sass extensions).
             // By default we support SASS Modules with the
             // extensions .module.scss or .module.sass
-            {
-              test: sassRegex,
-              exclude: sassModuleRegex,
-              use: getStyleLoaders(
-                {
-                  importLoaders: 2,
-                  sourceMap: isEnvProduction && shouldUseSourceMap,
-                },
-                'sass-loader'
-              ),
-              // Don't consider CSS imports dead code even if the
-              // containing package claims to have no side effects.
-              // Remove this when webpack adds a warning or an error for this.
-              // See https://github.com/webpack/webpack/issues/6571
-              sideEffects: true,
-            },
+            // {
+            //   test: sassRegex,
+            //   exclude: sassModuleRegex,
+            //   use: getStyleLoaders(
+            //     {
+            //       importLoaders: 2,
+            //       sourceMap: isEnvProduction && shouldUseSourceMap,
+            //     },
+            //     'sass-loader'
+            //   ),
+            //   // Don't consider CSS imports dead code even if the
+            //   // containing package claims to have no side effects.
+            //   // Remove this when webpack adds a warning or an error for this.
+            //   // See https://github.com/webpack/webpack/issues/6571
+            //   sideEffects: true,
+            // },
             // Adds support for CSS Modules, but using SASS
             // using the extension .module.scss or .module.sass
-            {
-              test: sassModuleRegex,
-              use: getStyleLoaders(
-                {
-                  importLoaders: 2,
-                  sourceMap: isEnvProduction && shouldUseSourceMap,
-                  modules: true,
-                  getLocalIdent: getCSSModuleLocalIdent,
-                },
-                'sass-loader'
-              ),
-            },
+            // {
+            //   test: sassModuleRegex,
+            //   use: getStyleLoaders(
+            //     {
+            //       importLoaders: 2,
+            //       sourceMap: isEnvProduction && shouldUseSourceMap,
+            //       modules: true,
+            //       getLocalIdent: getCSSModuleLocalIdent,
+            //     },
+            //     'sass-loader'
+            //   ),
+            // },
             // "file" loader makes sure those assets get served by WebpackDevServer.
             // When you `import` an asset, you get its (virtual) filename.
             // In production, they would get copied to the `build` folder.

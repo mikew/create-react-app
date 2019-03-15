@@ -350,6 +350,26 @@ module.exports = function(webpackEnv) {
               include: paths.srcPaths,
               exclude: /[\\/]node_modules[\\/]/,
               use: [
+                // enable file based cache
+                isEnvProduction && {
+                  loader: require.resolve('cache-loader'),
+                  options: {
+                    cacheDirectory: path.resolve(
+                      path.dirname(require.resolve('cache-loader')),
+                      '../.cache-loader'
+                    ),
+                  },
+                },
+
+                // run compilation threaded
+                isEnvProduction && {
+                  loader: require.resolve('thread-loader'),
+                  options: {
+                    // there should be 1 cpu for the fork-ts-checker-webpack-plugin
+                    workers: require('os').cpus().length - 1,
+                  },
+                },
+
                 {
                   loader: require.resolve('ts-loader'),
                   options: {

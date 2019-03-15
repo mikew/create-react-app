@@ -307,27 +307,29 @@ module.exports = function(webpackEnv) {
 
         // First, run the linter.
         // It's important to do this before Babel processes the JS.
-        {
-          test: /\.(js|mjs|jsx)$/,
-          enforce: 'pre',
-          use: [
-            {
-              options: {
-                formatter: require.resolve('react-dev-utils/eslintFormatter'),
-                eslintPath: require.resolve('eslint'),
-                // @remove-on-eject-begin
-                baseConfig: {
-                  extends: [require.resolve('eslint-config-react-app')],
-                },
-                ignore: false,
-                useEslintrc: false,
-                // @remove-on-eject-end
-              },
-              loader: require.resolve('eslint-loader'),
-            },
-          ],
-          include: paths.appSrc,
-        },
+        // {
+        //   test: /\.(js|mjs|jsx)$/,
+        //   enforce: 'pre',
+        //   use: [
+        //     {
+        //       options: {
+        //         formatter: require.resolve(
+        //           'react-dev-utils/eslintFormatter'
+        //         ),
+        //         eslintPath: require.resolve('eslint'),
+        //         // @remove-on-eject-begin
+        //         baseConfig: {
+        //           extends: [require.resolve('eslint-config-react-app')],
+        //         },
+        //         ignore: false,
+        //         useEslintrc: false,
+        //         // @remove-on-eject-end
+        //       },
+        //       loader: require.resolve('eslint-loader'),
+        //     },
+        //   ],
+        //   include: paths.appSrc,
+        // },
         {
           // "oneOf" will traverse all following loaders until one will
           // match the requirements. When no loader matches it will fall
@@ -661,6 +663,7 @@ module.exports = function(webpackEnv) {
           useTypescriptIncrementalApi: true,
           checkSyntacticErrors: true,
           tsconfig: paths.appTsConfig,
+          tslint: paths.appTsLint,
           reportFiles: [
             '**',
             '!**/*.json',

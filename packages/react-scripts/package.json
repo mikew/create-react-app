@@ -20,7 +20,9 @@
     "utils"
   ],
   "bin": {
-    "react-scripts": "./bin/react-scripts.js"
+    "react-scripts": "./bin/react-scripts.js",
+    "react-scripts-ts": "./bin/react-scripts.js",
+    "react-scripts-tsc": "./bin/react-scripts.js"
   },
   "types": "./lib/react-app.d.ts",
   "dependencies": {

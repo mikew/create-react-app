@@ -9,8 +9,10 @@
 
 const fs = require('fs');
 const chalk = require('react-dev-utils/chalk');
+const { pathsToModuleNameMapper } = require('ts-jest/utils');
 const paths = require('../../config/paths');
 const modules = require('../../config/modules');
+const getTypescriptCompilerPath = require('./getTypescriptCompilerPath');
 
 module.exports = (resolve, rootDir, isEjecting) => {
   // Use this instead of `paths.testsSetup` to avoid putting
@@ -21,6 +23,13 @@ module.exports = (resolve, rootDir, isEjecting) => {
   const setupTestsFile = fs.existsSync(paths.testsSetup)
     ? `<rootDir>/src/setupTests.${setupTestsFileExtension}`
     : undefined;
+  const typescriptCompilerPath = getTypescriptCompilerPath();
+  const typescript = require(typescriptCompilerPath);
+  const tsConfig = typescript.getParsedCommandLineOfConfigFile(
+    paths.appTsConfig,
+    undefined,
+    typescript.sys
+  );
 
   const config = {
     collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
@@ -38,9 +47,10 @@ module.exports = (resolve, rootDir, isEjecting) => {
     ],
     testEnvironment: 'jest-environment-jsdom-fourteen',
     transform: {
-      '^.+\\.(js|jsx|ts|tsx)$': isEjecting
-        ? '<rootDir>/node_modules/babel-jest'
-        : resolve('config/jest/babelTransform.js'),
+      // '^.+\\.(js|jsx|ts|tsx)$': isEjecting
+      //   ? '<rootDir>/node_modules/babel-jest'
+      //   : resolve('config/jest/babelTransform.js'),
+      '^.+\\.(js|jsx|ts|tsx)$': require.resolve('ts-jest'),
       '^.+\\.css$': resolve('config/jest/cssTransform.js'),
       '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(
         'config/jest/fileTransform.js'
@@ -54,14 +64,25 @@ module.exports = (resolve, rootDir, isEjecting) => {
     moduleNameMapper: {
       '^react-native$': 'react-native-web',
       '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
+      ...pathsToModuleNameMapper(tsConfig.options.paths || {}, {
+        prefix: '<rootDir>',
+      }),
     },
-    moduleFileExtensions: [...paths.moduleFileExtensions, 'node'].filter(
-      ext => !ext.includes('mjs')
-    ),
+    moduleFileExtensions: [
+      ...paths.moduleFileExtensions,
+      'node',
+      'd.ts',
+    ].filter(ext => !ext.includes('mjs')),
     watchPlugins: [
       'jest-watch-typeahead/filename',
       'jest-watch-typeahead/testname',
     ],
+    globals: {
+      'ts-jest': {
+        tsConfig: paths.appTsConfig,
+        compiler: typescriptCompilerPath,
+      },
+    },
   };
   if (rootDir) {
     config.rootDir = rootDir;

@@ -51,7 +51,7 @@ const imageInlineSizeLimit = parseInt(
 );
 
 // Check if TypeScript is setup
-const useTypeScript = fs.existsSync(paths.appTsConfig);
+const useTypeScript = true;
 
 // style files regexes
 const cssRegex = /\.css$/;

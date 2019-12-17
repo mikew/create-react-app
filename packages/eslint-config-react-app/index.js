@@ -26,9 +26,9 @@ const restrictedGlobals = require('confusing-browser-globals');
 module.exports = {
   root: true,
 
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
 
-  plugins: ['import', 'flowtype', 'jsx-a11y', 'react', 'react-hooks'],
+  plugins: ['@typescript-eslint', 'jsx-a11y', 'react', 'react-hooks'],
 
   env: {
     browser: true,
@@ -44,6 +44,9 @@ module.exports = {
     ecmaFeatures: {
       jsx: true,
     },
+
+    // typescript-eslint specific options
+    warnOnUnsupportedTypeScriptVersion: true,
   },
 
   settings: {
@@ -55,18 +58,18 @@ module.exports = {
   overrides: [
     {
       files: ['**/*.ts?(x)'],
-      parser: '@typescript-eslint/parser',
-      parserOptions: {
-        ecmaVersion: 2018,
-        sourceType: 'module',
-        ecmaFeatures: {
-          jsx: true,
-        },
+      // parser: '@typescript-eslint/parser',
+      // parserOptions: {
+      //   ecmaVersion: 2018,
+      //   sourceType: 'module',
+      //   ecmaFeatures: {
+      //     jsx: true,
+      //   },
 
-        // typescript-eslint specific options
-        warnOnUnsupportedTypeScriptVersion: true,
-      },
-      plugins: ['@typescript-eslint'],
+      //   // typescript-eslint specific options
+      //   warnOnUnsupportedTypeScriptVersion: true,
+      // },
+      // plugins: ['@typescript-eslint'],
       // If adding a typescript-eslint version of an existing ESLint rule,
       // make sure to disable the ESLint rule here.
       rules: {
@@ -252,9 +255,9 @@ module.exports = {
     'getter-return': 'warn',
 
     // https://github.com/benmosher/eslint-plugin-import/tree/master/docs/rules
-    'import/first': 'error',
-    'import/no-amd': 'error',
-    'import/no-webpack-loader-syntax': 'error',
+    // 'import/first': 'error',
+    // 'import/no-amd': 'error',
+    // 'import/no-webpack-loader-syntax': 'error',
 
     // https://github.com/yannickcr/eslint-plugin-react/tree/master/docs/rules
     'react/forbid-foreign-prop-types': ['warn', { allowInPropTypes: true }],
@@ -312,8 +315,8 @@ module.exports = {
     'react-hooks/rules-of-hooks': 'error',
 
     // https://github.com/gajus/eslint-plugin-flowtype
-    'flowtype/define-flow-type': 'warn',
-    'flowtype/require-valid-file-annotation': 'warn',
-    'flowtype/use-flow-type': 'warn',
+    // 'flowtype/define-flow-type': 'warn',
+    // 'flowtype/require-valid-file-annotation': 'warn',
+    // 'flowtype/use-flow-type': 'warn',
   },
 };

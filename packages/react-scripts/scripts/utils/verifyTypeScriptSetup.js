@@ -10,7 +10,7 @@
 
 const chalk = require('react-dev-utils/chalk');
 const fs = require('fs');
-const resolve = require('resolve');
+// const resolve = require('resolve');
 const path = require('path');
 const paths = require('../../config/paths');
 const getTypescriptCompilerPath = require('./getTypescriptCompilerPath');

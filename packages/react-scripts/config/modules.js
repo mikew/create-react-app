@@ -8,7 +8,7 @@
 // @remove-on-eject-end
 'use strict';
 
-const fs = require('fs');
+// const fs = require('fs');
 const path = require('path');
 const paths = require('./paths');
 // const chalk = require('react-dev-utils/chalk');

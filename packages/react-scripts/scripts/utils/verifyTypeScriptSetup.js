@@ -13,6 +13,7 @@ const fs = require('fs');
 const resolve = require('resolve');
 const path = require('path');
 const paths = require('../../config/paths');
+const getTypescriptCompilerPath = require('./getTypescriptCompilerPath');
 const os = require('os');
 const immer = require('react-dev-utils/immer').produce;
 const globby = require('react-dev-utils/globby').sync;
@@ -59,9 +60,7 @@ function verifyTypeScriptSetup() {
   // Ensure typescript is installed
   let ts;
   try {
-    ts = require(resolve.sync('typescript', {
-      basedir: paths.appNodeModules,
-    }));
+    ts = require(getTypescriptCompilerPath());
   } catch (_) {
     console.error(
       chalk.bold.red(

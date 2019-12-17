@@ -11,8 +11,10 @@
 const fs = require('fs');
 const path = require('path');
 const paths = require('./paths');
-const chalk = require('react-dev-utils/chalk');
-const resolve = require('resolve');
+// const chalk = require('react-dev-utils/chalk');
+// const resolve = require('resolve');
+const { pathsToModuleNameMapper } = require('ts-jest/utils');
+const readTypescriptConfig = require('../scripts/utils/readTypescriptConfig');
 
 /**
  * Get additional module paths based on the baseUrl of a compilerOptions object.

@@ -70,19 +70,31 @@ function getAdditionalModulePaths(options = {}) {
  * @param {*} options
  */
 function getWebpackAliases(options = {}) {
-  const baseUrl = options.baseUrl;
+  const baseUrl = options.baseUrl || '';
 
-  if (!baseUrl) {
-    return {};
-  }
+  // if (!baseUrl) {
+  //   return {};
+  // }
 
   const baseUrlResolved = path.resolve(paths.appPath, baseUrl);
 
-  if (path.relative(paths.appPath, baseUrlResolved) === '') {
-    return {
-      src: paths.appSrc,
-    };
+  // if (path.relative(paths.appPath, baseUrlResolved) === '') {
+  //   return {
+  //     src: paths.appSrc,
+  //   };
+  // }
+
+  const aliases = {};
+  const optionsPaths = options.paths || {};
+
+  for (const key in optionsPaths) {
+    const sanitizedKey = key.replace(/\/\*$/, '');
+    const sanitizedValue = optionsPaths[key][0].replace(/\/\*$/, '');
+
+    aliases[sanitizedKey] = path.resolve(baseUrlResolved, sanitizedValue);
   }
+
+  return aliases;
 }
 
 /**

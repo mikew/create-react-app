@@ -103,19 +103,13 @@ function getWebpackAliases(options = {}) {
  * @param {*} options
  */
 function getJestAliases(options = {}) {
-  const baseUrl = options.baseUrl;
-
-  if (!baseUrl) {
-    return {};
+  if (process.env.NODE_ENV !== 'test') {
+    return;
   }
 
-  const baseUrlResolved = path.resolve(paths.appPath, baseUrl);
-
-  if (path.relative(paths.appPath, baseUrlResolved) === '') {
-    return {
-      '^src/(.*)$': '<rootDir>/src/$1',
-    };
-  }
+  return pathsToModuleNameMapper(options.paths || {}, {
+    prefix: '<rootDir>',
+  });
 }
 
 function getModules() {

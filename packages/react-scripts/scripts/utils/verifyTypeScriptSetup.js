@@ -108,27 +108,35 @@ function verifyTypeScriptSetup() {
     forceConsistentCasingInFileNames: { suggested: true },
     // TODO: Enable for v4.0 (#6936)
     // noFallthroughCasesInSwitch: { suggested: true },
+    jsx: { suggested: 'react' },
+    sourceMap: { suggested: true },
+    baseUrl: { suggested: '.' },
+    paths: {
+      suggested: {
+        '@src/*': ['src/*'],
+      },
+    },
 
     // These values are required and cannot be changed by the user
     // Keep this in sync with the webpack config
     module: {
       parsedValue: ts.ModuleKind.ESNext,
-      value: 'esnext',
+      suggested: 'esnext',
       reason: 'for import() and import/export',
     },
     moduleResolution: {
       parsedValue: ts.ModuleResolutionKind.NodeJs,
-      value: 'node',
+      suggested: 'node',
       reason: 'to match webpack resolution',
     },
-    resolveJsonModule: { value: true, reason: 'to match webpack loader' },
-    isolatedModules: { value: true, reason: 'implementation limitation' },
+    resolveJsonModule: { suggested: true, reason: 'to match webpack loader' },
+    // isolatedModules: { value: true, reason: 'implementation limitation' },
     noEmit: { value: true },
-    jsx: {
-      parsedValue: ts.JsxEmit.React,
-      suggested: 'react',
-    },
-    paths: { value: undefined, reason: 'aliased imports are not supported' },
+    // jsx: {
+    //   parsedValue: ts.JsxEmit.React,
+    //   suggested: 'react',
+    // },
+    // paths: { value: undefined, reason: 'aliased imports are not supported' },
   };
 
   const formatDiagnosticHost = {

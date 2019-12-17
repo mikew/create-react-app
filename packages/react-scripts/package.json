@@ -1,6 +1,6 @@
 {
-  "version": "3.3.0",
   "name": "react-scripts-tsc",
+  "version": "3.3.0-rc.1",
   "description": "Configuration and scripts for Create React App.",
   "repository": {
     "type": "git",

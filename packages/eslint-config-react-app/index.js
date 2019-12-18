@@ -28,7 +28,7 @@ module.exports = {
 
   parser: '@typescript-eslint/parser',
 
-  plugins: ['@typescript-eslint', 'jsx-a11y', 'react', 'react-hooks'],
+  plugins: ['@typescript-eslint', 'import', 'jsx-a11y', 'react', 'react-hooks'],
 
   env: {
     browser: true,
@@ -255,9 +255,9 @@ module.exports = {
     'getter-return': 'warn',
 
     // https://github.com/benmosher/eslint-plugin-import/tree/master/docs/rules
-    // 'import/first': 'error',
-    // 'import/no-amd': 'error',
-    // 'import/no-webpack-loader-syntax': 'error',
+    'import/first': 'error',
+    'import/no-amd': 'error',
+    'import/no-webpack-loader-syntax': 'error',
 
     // https://github.com/yannickcr/eslint-plugin-react/tree/master/docs/rules
     'react/forbid-foreign-prop-types': ['warn', { allowInPropTypes: true }],

@@ -393,38 +393,13 @@ module.exports = function(webpackEnv) {
               test: /\.tsx?$/,
               include: paths.srcPaths,
               exclude: /[\\/]node_modules[\\/]/,
-              use: [
-                // enable file based cache
-                isEnvProduction && {
-                  loader: require.resolve('cache-loader'),
-                  options: {
-                    cacheDirectory: path.resolve(
-                      path.dirname(require.resolve('cache-loader')),
-                      '../.cache-loader'
-                    ),
-                  },
-                },
-
-                // run compilation threaded
-                isEnvProduction && {
-                  loader: require.resolve('thread-loader'),
-                  options: {
-                    // there should be 1 cpu for the fork-ts-checker-webpack-plugin
-                    workers: require('os').cpus().length - 1,
-                  },
-                },
-
-                {
-                  loader: require.resolve('ts-loader'),
-                  options: {
-                    happyPackMode: isEnvProduction,
-                    transpileOnly: true,
-                    configFile: paths.appTsConfig,
-                    compiler: typescriptCompilerPath,
-                    // getCustomTransformers: require.resolve('./webpack.ts-transformers.js')
-                  },
-                },
-              ].filter(Boolean),
+              loader: require.resolve('ts-loader'),
+              options: {
+                transpileOnly: true,
+                configFile: paths.appTsConfig,
+                compiler: typescriptCompilerPath,
+                // getCustomTransformers: require.resolve('./webpack.ts-transformers.js')
+              },
             },
             // Process application JS with Babel.
             // The preset includes JSX, Flow, TypeScript, and some ESnext features.

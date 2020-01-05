@@ -357,7 +357,7 @@ module.exports = function(webpackEnv) {
                 emitError: true,
                 emitWarning: true,
                 // @remove-on-eject-begin
-                ignore: process.env.EXTEND_ESLINT === 'true',
+                ignore: true,
                 baseConfig:
                   process.env.EXTEND_ESLINT === 'true'
                     ? undefined

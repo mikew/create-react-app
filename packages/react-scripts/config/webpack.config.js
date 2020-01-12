@@ -391,7 +391,7 @@ module.exports = function(webpackEnv) {
             },
             // Process TypeScript
             {
-              test: /\.tsx?$/,
+              test: /\.(js|mjs|jsx|ts|tsx)$/,
               include: paths.srcPaths,
               exclude: /[\\/]node_modules[\\/]/,
               loader: require.resolve('ts-loader'),

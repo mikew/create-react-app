@@ -73,22 +73,23 @@ const resolveModule = (resolveFn, filePath) => {
   return resolveFn(`${filePath}.js`);
 };
 
-function getTsConfig(resolveFn, configName, dir = '') {
+function getTsConfig(resolveFn, configName) {
+  let configNameEnv = configName;
   if (process.env.NODE_ENV === 'production') {
-    configName = configName.replace('.json', '.prod.json');
+    configNameEnv = configName.replace('.json', '.prod.json');
   }
 
   if (process.env.NODE_ENV === 'test') {
-    configName = configName.replace('.json', '.test.json');
+    configNameEnv = configName.replace('.json', '.test.json');
   }
 
-  const tsConfigEnv = resolveFn(path.join(dir, configName));
+  const tsConfigEnv = resolveFn(configNameEnv);
 
   if (fs.existsSync(tsConfigEnv)) {
     return tsConfigEnv;
   }
 
-  return resolveFn(path.join(dir, configName));
+  return resolveFn(configName);
 }
 
 // config after eject: we're in ./config/

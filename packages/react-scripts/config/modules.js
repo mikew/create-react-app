@@ -8,11 +8,13 @@
 // @remove-on-eject-end
 'use strict';
 
-const fs = require('fs');
+// const fs = require('fs');
 const path = require('path');
 const paths = require('./paths');
-const chalk = require('react-dev-utils/chalk');
-const resolve = require('resolve');
+// const chalk = require('react-dev-utils/chalk');
+// const resolve = require('resolve');
+const { pathsToModuleNameMapper } = require('ts-jest/utils');
+const readTypescriptConfig = require('../scripts/utils/readTypescriptConfig');
 
 /**
  * Get additional module paths based on the baseUrl of a compilerOptions object.
@@ -56,12 +58,12 @@ function getAdditionalModulePaths(options = {}) {
   }
 
   // Otherwise, throw an error.
-  throw new Error(
-    chalk.red.bold(
-      "Your project's `baseUrl` can only be set to `src` or `node_modules`." +
-        ' Create React App does not support other values at this time.'
-    )
-  );
+  // throw new Error(
+  //   chalk.red.bold(
+  //     "Your project's `baseUrl` can only be set to `src` or `node_modules`." +
+  //       ' Create React App does not support other values at this time.'
+  //   )
+  // );
 }
 
 /**
@@ -70,19 +72,31 @@ function getAdditionalModulePaths(options = {}) {
  * @param {*} options
  */
 function getWebpackAliases(options = {}) {
-  const baseUrl = options.baseUrl;
+  const baseUrl = options.baseUrl || '';
 
-  if (!baseUrl) {
-    return {};
-  }
+  // if (!baseUrl) {
+  //   return {};
+  // }
 
   const baseUrlResolved = path.resolve(paths.appPath, baseUrl);
 
-  if (path.relative(paths.appPath, baseUrlResolved) === '') {
-    return {
-      src: paths.appSrc,
-    };
+  // if (path.relative(paths.appPath, baseUrlResolved) === '') {
+  //   return {
+  //     src: paths.appSrc,
+  //   };
+  // }
+
+  const aliases = {};
+  const optionsPaths = options.paths || {};
+
+  for (const key in optionsPaths) {
+    const sanitizedKey = key.replace(/\/\*$/, '');
+    const sanitizedValue = optionsPaths[key][0].replace(/\/\*$/, '');
+
+    aliases[sanitizedKey] = path.resolve(baseUrlResolved, sanitizedValue);
   }
+
+  return aliases;
 }
 
 /**
@@ -91,57 +105,52 @@ function getWebpackAliases(options = {}) {
  * @param {*} options
  */
 function getJestAliases(options = {}) {
-  const baseUrl = options.baseUrl;
-
-  if (!baseUrl) {
-    return {};
+  if (process.env.NODE_ENV !== 'test') {
+    return;
   }
 
-  const baseUrlResolved = path.resolve(paths.appPath, baseUrl);
-
-  if (path.relative(paths.appPath, baseUrlResolved) === '') {
-    return {
-      '^src/(.*)$': '<rootDir>/src/$1',
-    };
-  }
+  return pathsToModuleNameMapper(options.paths || {}, {
+    prefix: '<rootDir>',
+  });
 }
 
 function getModules() {
   // Check if TypeScript is setup
-  const hasTsConfig = fs.existsSync(paths.appTsConfig);
-  const hasJsConfig = fs.existsSync(paths.appJsConfig);
+  const hasTsConfig = true;
+  // const hasJsConfig = fs.existsSync(paths.appJsConfig);
 
-  if (hasTsConfig && hasJsConfig) {
-    throw new Error(
-      'You have both a tsconfig.json and a jsconfig.json. If you are using TypeScript please remove your jsconfig.json file.'
-    );
-  }
+  // if (hasTsConfig && hasJsConfig) {
+  //   throw new Error(
+  //     'You have both a tsconfig.json and a jsconfig.json. If you are using TypeScript please remove your jsconfig.json file.'
+  //   );
+  // }
 
   let config;
 
   // If there's a tsconfig.json we assume it's a
   // TypeScript project and set up the config
   // based on tsconfig.json
-  if (hasTsConfig) {
-    const ts = require(resolve.sync('typescript', {
-      basedir: paths.appNodeModules,
-    }));
-    config = ts.readConfigFile(paths.appTsConfig, ts.sys.readFile).config;
-    // Otherwise we'll check if there is jsconfig.json
-    // for non TS projects.
-  } else if (hasJsConfig) {
-    config = require(paths.appJsConfig);
-  }
+  // if (hasTsConfig) {
+  //   const ts = require(resolve.sync('typescript', {
+  //     basedir: paths.appNodeModules,
+  //   }));
+  //   config = ts.readConfigFile(paths.appTsConfig, ts.sys.readFile).config;
+  //   // Otherwise we'll check if there is jsconfig.json
+  //   // for non TS projects.
+  // } else if (hasJsConfig) {
+  //   config = require(paths.appJsConfig);
+  // }
 
-  config = config || {};
-  const options = config.compilerOptions || {};
+  // config = config || {};
+  // const options = config.compilerOptions || {};
 
-  const additionalModulePaths = getAdditionalModulePaths(options);
+  // const additionalModulePaths = getAdditionalModulePaths(options);
+  config = readTypescriptConfig();
 
   return {
-    additionalModulePaths: additionalModulePaths,
-    webpackAliases: getWebpackAliases(options),
-    jestAliases: getJestAliases(options),
+    additionalModulePaths: getAdditionalModulePaths(config.options),
+    webpackAliases: getWebpackAliases(config.options),
+    jestAliases: getJestAliases(config.options),
     hasTsConfig,
   };
 }

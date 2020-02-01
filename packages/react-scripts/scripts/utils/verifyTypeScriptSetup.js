@@ -10,9 +10,10 @@
 
 const chalk = require('react-dev-utils/chalk');
 const fs = require('fs');
-const resolve = require('resolve');
+// const resolve = require('resolve');
 const path = require('path');
 const paths = require('../../config/paths');
+const getTypescriptCompilerPath = require('./getTypescriptCompilerPath');
 const os = require('os');
 const immer = require('react-dev-utils/immer').produce;
 const globby = require('react-dev-utils/globby').sync;
@@ -59,9 +60,7 @@ function verifyTypeScriptSetup() {
   // Ensure typescript is installed
   let ts;
   try {
-    ts = require(resolve.sync('typescript', {
-      basedir: paths.appNodeModules,
-    }));
+    ts = require(getTypescriptCompilerPath());
   } catch (_) {
     console.error(
       chalk.bold.red(
@@ -108,27 +107,35 @@ function verifyTypeScriptSetup() {
     forceConsistentCasingInFileNames: { suggested: true },
     // TODO: Enable for v4.0 (#6936)
     // noFallthroughCasesInSwitch: { suggested: true },
+    jsx: { suggested: 'react' },
+    sourceMap: { suggested: true },
+    baseUrl: { suggested: '.' },
+    paths: {
+      suggested: {
+        '@src/*': ['src/*'],
+      },
+    },
 
     // These values are required and cannot be changed by the user
     // Keep this in sync with the webpack config
     module: {
       parsedValue: ts.ModuleKind.ESNext,
-      value: 'esnext',
+      suggested: 'esnext',
       reason: 'for import() and import/export',
     },
     moduleResolution: {
       parsedValue: ts.ModuleResolutionKind.NodeJs,
-      value: 'node',
+      suggested: 'node',
       reason: 'to match webpack resolution',
     },
-    resolveJsonModule: { value: true, reason: 'to match webpack loader' },
-    isolatedModules: { value: true, reason: 'implementation limitation' },
+    resolveJsonModule: { suggested: true, reason: 'to match webpack loader' },
+    // isolatedModules: { value: true, reason: 'implementation limitation' },
     noEmit: { value: true },
-    jsx: {
-      parsedValue: ts.JsxEmit.React,
-      suggested: 'react',
-    },
-    paths: { value: undefined, reason: 'aliased imports are not supported' },
+    // jsx: {
+    //   parsedValue: ts.JsxEmit.React,
+    //   suggested: 'react',
+    // },
+    // paths: { value: undefined, reason: 'aliased imports are not supported' },
   };
 
   const formatDiagnosticHost = {
@@ -256,7 +263,7 @@ function verifyTypeScriptSetup() {
   if (!fs.existsSync(paths.appTypeDeclarations)) {
     fs.writeFileSync(
       paths.appTypeDeclarations,
-      `/// <reference types="react-scripts" />${os.EOL}`
+      `/// <reference types="react-scripts-tsc" />${os.EOL}`
     );
   }
 }

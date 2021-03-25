@@ -11,6 +11,7 @@ const fs = require('fs');
 const chalk = require('react-dev-utils/chalk');
 const paths = require('../../config/paths');
 const modules = require('../../config/modules');
+const getTypescriptCompilerPath = require('./getTypescriptCompilerPath');
 
 module.exports = (resolve, rootDir, isEjecting) => {
   // Use this instead of `paths.testsSetup` to avoid putting
@@ -21,6 +22,7 @@ module.exports = (resolve, rootDir, isEjecting) => {
   const setupTestsFile = fs.existsSync(paths.testsSetup)
     ? `<rootDir>/src/setupTests.${setupTestsFileExtension}`
     : undefined;
+  const typescriptCompilerPath = getTypescriptCompilerPath();
 
   const config = {
     roots: ['<rootDir>/src'],
@@ -41,9 +43,10 @@ module.exports = (resolve, rootDir, isEjecting) => {
     testEnvironment: 'jsdom',
     testRunner: require.resolve('jest-circus/runner'),
     transform: {
-      '^.+\\.(js|jsx|mjs|cjs|ts|tsx)$': resolve(
-        'config/jest/babelTransform.js'
-      ),
+      // '^.+\\.(js|jsx|mjs|cjs|ts|tsx)$': resolve(
+      //   'config/jest/babelTransform.js'
+      // ),
+      '^.+\\.(js|jsx|mjs|cjs|ts|tsx)$': require.resolve('ts-jest'),
       '^.+\\.css$': resolve('config/jest/cssTransform.js'),
       '^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)': resolve(
         'config/jest/fileTransform.js'
@@ -59,14 +62,22 @@ module.exports = (resolve, rootDir, isEjecting) => {
       '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
       ...(modules.jestAliases || {}),
     },
-    moduleFileExtensions: [...paths.moduleFileExtensions, 'node'].filter(
-      ext => !ext.includes('mjs')
-    ),
+    moduleFileExtensions: [
+      ...paths.moduleFileExtensions,
+      'node',
+      'd.ts',
+    ].filter(ext => !ext.includes('mjs')),
     watchPlugins: [
       'jest-watch-typeahead/filename',
       'jest-watch-typeahead/testname',
     ],
     resetMocks: true,
+    globals: {
+      'ts-jest': {
+        tsConfig: paths.appTsConfig,
+        compiler: typescriptCompilerPath,
+      },
+    },
   };
   if (rootDir) {
     config.rootDir = rootDir;

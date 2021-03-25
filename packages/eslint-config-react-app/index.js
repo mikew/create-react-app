@@ -26,23 +26,50 @@ const restrictedGlobals = require('confusing-browser-globals');
 module.exports = {
   extends: [require.resolve('./base')],
 
-  plugins: ['import', 'flowtype', 'jsx-a11y', 'react-hooks'],
+  parser: '@typescript-eslint/parser',
+
+  plugins: ['@typescript-eslint', 'import', 'jsx-a11y', 'react-hooks'],
+
+  env: {
+    browser: true,
+    commonjs: true,
+    es6: true,
+    jest: true,
+    node: true,
+  },
+
+  parserOptions: {
+    ecmaVersion: 2018,
+    sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true,
+    },
+
+    // typescript-eslint specific options
+    warnOnUnsupportedTypeScriptVersion: true,
+  },
+
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
 
   overrides: [
     {
       files: ['**/*.ts?(x)'],
-      parser: '@typescript-eslint/parser',
-      parserOptions: {
-        ecmaVersion: 2018,
-        sourceType: 'module',
-        ecmaFeatures: {
-          jsx: true,
-        },
+      // parser: '@typescript-eslint/parser',
+      // parserOptions: {
+      //   ecmaVersion: 2018,
+      //   sourceType: 'module',
+      //   ecmaFeatures: {
+      //     jsx: true,
+      //   },
 
-        // typescript-eslint specific options
-        warnOnUnsupportedTypeScriptVersion: true,
-      },
-      plugins: ['@typescript-eslint'],
+      //   // typescript-eslint specific options
+      //   warnOnUnsupportedTypeScriptVersion: true,
+      // },
+      // plugins: ['@typescript-eslint'],
       // If adding a typescript-eslint version of an existing ESLint rule,
       // make sure to disable the ESLint rule here.
       rules: {
@@ -284,8 +311,8 @@ module.exports = {
     'react-hooks/rules-of-hooks': 'error',
 
     // https://github.com/gajus/eslint-plugin-flowtype
-    'flowtype/define-flow-type': 'warn',
-    'flowtype/require-valid-file-annotation': 'warn',
-    'flowtype/use-flow-type': 'warn',
+    // 'flowtype/define-flow-type': 'warn',
+    // 'flowtype/require-valid-file-annotation': 'warn',
+    // 'flowtype/use-flow-type': 'warn',
   },
 };

@@ -68,6 +68,37 @@ process.env.NODE_PATH = (process.env.NODE_PATH || '')
 // injected into the application via DefinePlugin in webpack configuration.
 const REACT_APP = /^REACT_APP_/i;
 
+// CLIEngine would do this, except it also searches for an eslintrc file in the
+// users home directory.
+function findEslintRc() {
+  const files = [
+    '.eslintrc.js',
+    '.eslintrc.yaml',
+    '.eslintrc.yml',
+    '.eslintrc.json',
+    '.eslintrc',
+    'package.json',
+  ];
+
+  for (const file of files) {
+    if (file === 'package.json') {
+      if (require(path.join(paths.appPath, file)).eslintConfig) {
+        return true;
+      }
+    } else {
+      if (fs.existsSync(path.join(paths.appPath, file))) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+if (process.env.EXTEND_ESLINT == null || process.env.EXTEND_ESLINT === '') {
+  process.env.EXTEND_ESLINT = findEslintRc() ? 'true' : undefined;
+}
+
 function getClientEnvironment(publicUrl) {
   const raw = Object.keys(process.env)
     .filter(key => REACT_APP.test(key))

@@ -10,9 +10,10 @@
 
 const chalk = require('react-dev-utils/chalk');
 const fs = require('fs');
-const resolve = require('resolve');
+// const resolve = require('resolve');
 const path = require('path');
 const paths = require('../../config/paths');
+const getTypescriptCompilerPath = require('./getTypescriptCompilerPath');
 const os = require('os');
 const semver = require('semver');
 const immer = require('react-dev-utils/immer').produce;
@@ -77,9 +78,7 @@ function verifyTypeScriptSetup() {
     // https://github.com/jsdom/jsdom/issues/2961
     const globalThisWasDefined = !!global.globalThis;
 
-    ts = require(resolve.sync('typescript', {
-      basedir: paths.appNodeModules,
-    }));
+    ts = require(getTypescriptCompilerPath());
 
     if (!globalThisWasDefined && !!global.globalThis) {
       delete global.globalThis;
@@ -129,21 +128,23 @@ function verifyTypeScriptSetup() {
     strict: { suggested: true },
     forceConsistentCasingInFileNames: { suggested: true },
     noFallthroughCasesInSwitch: { suggested: true },
+    sourceMap: { suggested: true },
+    baseUrl: { suggested: '.' },
 
     // These values are required and cannot be changed by the user
     // Keep this in sync with the webpack config
     module: {
       parsedValue: ts.ModuleKind.ESNext,
-      value: 'esnext',
+      suggested: 'esnext',
       reason: 'for import() and import/export',
     },
     moduleResolution: {
       parsedValue: ts.ModuleResolutionKind.NodeJs,
-      value: 'node',
+      suggested: 'node',
       reason: 'to match webpack resolution',
     },
-    resolveJsonModule: { value: true, reason: 'to match webpack loader' },
-    isolatedModules: { value: true, reason: 'implementation limitation' },
+    resolveJsonModule: { suggested: true, reason: 'to match webpack loader' },
+    // isolatedModules: { value: true, reason: 'implementation limitation' },
     noEmit: { value: true },
     jsx: {
       parsedValue:
@@ -156,7 +157,12 @@ function verifyTypeScriptSetup() {
           : 'react',
       reason: 'to support the new JSX transform in React 17',
     },
-    paths: { value: undefined, reason: 'aliased imports are not supported' },
+    // paths: { value: undefined, reason: 'aliased imports are not supported' },
+    paths: {
+      suggested: {
+        '@src/*': ['src/*'],
+      },
+    },
   };
 
   const formatDiagnosticHost = {
@@ -218,7 +224,7 @@ function verifyTypeScriptSetup() {
   if (appTsConfig.compilerOptions == null) {
     appTsConfig.compilerOptions = {};
     firstTimeSetup = true;
-  } 
+  }
 
   for (const option of Object.keys(compilerOptions)) {
     const { parsedValue, value, suggested, reason } = compilerOptions[option];
@@ -290,7 +296,7 @@ function verifyTypeScriptSetup() {
   if (!fs.existsSync(paths.appTypeDeclarations)) {
     fs.writeFileSync(
       paths.appTypeDeclarations,
-      `/// <reference types="react-scripts" />${os.EOL}`
+      `/// <reference types="react-scripts-tsc" />${os.EOL}`
     );
   }
 }

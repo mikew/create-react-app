@@ -34,6 +34,7 @@ const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const ReactRefreshTypeScript = require('react-refresh-typescript');
 // @remove-on-eject-begin
 // const getCacheIdentifier = require('react-dev-utils/getCacheIdentifier');
 // @remove-on-eject-end
@@ -413,6 +414,18 @@ module.exports = function (webpackEnv) {
                 transpileOnly: true,
                 configFile: paths.appTsConfig,
                 compiler: typescriptCompilerPath,
+                compilerOptions: {
+                  module: 'esnext',
+                },
+                getCustomTransformers: () => ({
+                  before: isEnvDevelopment
+                    ? [
+                        ReactRefreshTypeScript({
+                          ts: require(typescriptCompilerPath),
+                        }),
+                      ]
+                    : [],
+                }),
                 // getCustomTransformers: require.resolve('./webpack.ts-transformers.js')
               },
             },

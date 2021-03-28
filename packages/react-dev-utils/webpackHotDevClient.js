@@ -227,7 +227,8 @@ function isUpdateAvailable() {
 
 // webpack disallows updates in other states.
 function canApplyUpdates() {
-  return module.hot.status() === 'idle';
+  const status = module.hot.status();
+  return status === 'idle' || status === 'abort';
 }
 
 // Attempt to update code on the fly, fall back to a hard reload.

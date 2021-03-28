@@ -418,13 +418,13 @@ module.exports = function (webpackEnv) {
                   module: 'esnext',
                 },
                 getCustomTransformers: () => ({
-                  before: isEnvDevelopment
-                    ? [
-                        ReactRefreshTypeScript({
-                          ts: require(typescriptCompilerPath),
-                        }),
-                      ]
-                    : [],
+                  before: [
+                    isEnvDevelopment &&
+                      shouldUseReactRefresh &&
+                      ReactRefreshTypeScript({
+                        ts: require(typescriptCompilerPath),
+                      }),
+                  ].filter(Boolean),
                 }),
                 // getCustomTransformers: require.resolve('./webpack.ts-transformers.js')
               },

@@ -9,11 +9,11 @@
 'use strict';
 
 const fs = require('fs');
-const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware');
-const evalSourceMapMiddleware = require('react-dev-utils/evalSourceMapMiddleware');
-const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMiddleware');
-const ignoredFiles = require('react-dev-utils/ignoredFiles');
-const redirectServedPath = require('react-dev-utils/redirectServedPathMiddleware');
+const errorOverlayMiddleware = require('react-dev-utils-tsc/errorOverlayMiddleware');
+const evalSourceMapMiddleware = require('react-dev-utils-tsc/evalSourceMapMiddleware');
+const noopServiceWorkerMiddleware = require('react-dev-utils-tsc/noopServiceWorkerMiddleware');
+const ignoredFiles = require('react-dev-utils-tsc/ignoredFiles');
+const redirectServedPath = require('react-dev-utils-tsc/redirectServedPathMiddleware');
 const paths = require('./paths');
 const getHttpsConfig = require('./getHttpsConfig');
 
